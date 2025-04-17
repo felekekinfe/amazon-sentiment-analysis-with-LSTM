@@ -125,3 +125,30 @@ class SentimentModel:
             self.lr_model=pickle.load(f)
         logging.info(f"Models loaded from {lstm_path} and {lr_path}")
 
+    def analyze_errors(self, X_test, y_test, reviews):
+        """
+        Analyze errors.
+        
+        Args:
+            X_test: Sequences.
+            y_test: Labels.
+            reviews: Texts.
+        
+        Returns:
+            list: Misclassified reviews.
+        
+        """
+
+        pred_probs=self.predict(X_test)
+        pred_labels=(pred_probs>0.5).astype(int)
+        misclassified = []
+        
+        for review_text,true_label,pred_label,confidence in zip(reviews, y_test, pred_labels, pred_probs):
+            if true_label != pred_label:
+                misclassified.append({
+                    'review': review_text,
+                    'true_label': true_label,
+                    'predicted_label': pred_label,
+                    'confidence': float(confidence)
+                })
+        return misclassified
