@@ -152,3 +152,49 @@ class SentimentModel:
                     'confidence': float(confidence)
                 })
         return misclassified
+
+    def save_misclassified_reviews(self, misclassified, filename):
+        """
+        Save errors.
+        
+        Args:
+            misclassified (list): Errors.
+            filename (str): Path.
+        """
+        import json
+        with open(filename, 'w') as f:
+            json.dump(misclassified, f, indent=4)
+        logging.info(f"Misclassified reviews saved to {filename}")
+
+    def compare_models(self, X_test, y_test, X_test_tfidf):
+        """
+        Compare models.
+        
+        Args:
+            X_test: Sequences.
+            y_test: Labels.
+            X_test_tfidf: TF-IDF vectors.
+        
+        Returns:
+            dict: Metrics.
+        """
+
+        lstm_pred_probs = self.predict(X_test)
+        lstm_pred = (lstm_pred_probs > 0.5).astype(int)
+        lr_pred = self.lr_model.predict(X_test_tfidf)
+        metrics = {
+            'LSTM': {
+                'precision': precision_score(y_test, lstm_pred),
+                'recall': recall_score(y_test, lstm_pred),
+                'f1_score': f1_score(y_test, lstm_pred)
+            },
+            'Logistic Regression': {
+                'precision': precision_score(y_test, lr_pred),
+                'recall': recall_score(y_test, lr_pred),
+                'f1_score': f1_score(y_test, lr_pred)
+           
+            }
+        }
+        for model_name, metric in metrics.items():
+            logging.info(f"{model_name} Metrics: {metric}")
+        return metrics
