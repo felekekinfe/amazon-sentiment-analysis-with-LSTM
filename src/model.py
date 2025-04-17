@@ -98,4 +98,18 @@ class SentimentModel:
         return self.lstm_model.predict(X,verbose=0).flatten()
 
     def save_models(self,lstm_path,lr_path):
+        """
+        Save models.
         
+        Args:
+            lstm_path (str): LSTM path.
+            lr_path (str): Logistic regression path.
+        """
+
+        self.lstm_model.save(lstm._path)
+        with open(lr_path, 'wb') as f:
+            pickle.dump(self.lr_model,f)
+        logging.info(f"Models saved to {lstm_path} and {lr_path}")
+
+        
+
