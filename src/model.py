@@ -111,5 +111,17 @@ class SentimentModel:
             pickle.dump(self.lr_model,f)
         logging.info(f"Models saved to {lstm_path} and {lr_path}")
 
+    def load_models(self,lstm_path,lr_path):
+        """
+        Load models.
         
+        Args:
+            lstm_path (str): LSTM path.
+            lr_path (str): Logistic regression path.
+        """
+
+        self.lstm_model=tf.keras.models.load_model(lstm_path)
+        with open(lr_path,'rb') as f:
+            self.lr_model=pickle.load(f)
+        logging.info(f"Models loaded from {lstm_path} and {lr_path}")
 
