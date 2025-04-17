@@ -49,3 +49,53 @@ class SentimentModel:
         ])
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         return model
+
+    def train(self, X_train, y_train, X_val, y_val, X_train_tfidf, X_val_tfidf, epochs=5, batch_size=64):
+        """
+        Train models.
+        
+        Args:
+            X_train, X_val: Sequences.
+            y_train, y_val: Labels (0 = negative, 1 = positive).
+            X_train_tfidf, X_val_tfidf: TF-IDF vectors.
+            epochs (int): Epochs.
+            batch_size (int): Batch size.
+        """
+
+        
+        
+        
+        logging.info("Training LSTM model...")
+        self.lstm_model=self.build_lstm()
+        self.lstm_model.fit(
+            X_train, y_train,
+            validation_data=(X_val, y_val),
+            epochs=epochs,
+            batch_size=batch_size,
+            verbose=1
+
+        )
+
+        logging.info("Training logistic regression model...")
+        self.lr_model=LogisticRegression(max_iter=1000)
+        self.lr_model.fit(
+            X_train_tfidf, y_train
+
+        )
+
+    def predict(self,X):
+
+        """
+        Predict with LSTM.
+        
+        Args:
+            X: Sequence.
+        
+        Returns:
+            np.array: Probabilities.
+        """
+
+        return self.lstm_model.predict(X,verbose=0).flatten()
+
+    def save_models(self,lstm_path,lr_path):
+        
